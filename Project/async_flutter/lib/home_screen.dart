@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<List<Article>> getArticles() async {
     const url =
-        'https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=219ec2779eae4d309d8f8049aad4603f'; //apikey is private
+        'https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=...'; //apikey is private
     final res = await http.get(Uri.parse(url));
     final body = json.decode(res.body) as Map<String, dynamic>;
     final List<Article> result = [];
