@@ -5,12 +5,13 @@ class Article {
   final String content;
   final String publishedAt;
 
-  Article(
-      { required this.title,
-        required this.urlToImage,
-        required this.author,
-        required this.content,
-        required this.publishedAt,});
+  Article({
+    required this.title,
+    required this.urlToImage,
+    required this.author,
+    required this.content,
+    required this.publishedAt,
+  });
 
   factory Article.fromJson(Map<String, dynamic> json) {
     return Article(
@@ -32,5 +33,24 @@ class Article {
     return data;
   }
 
+  Map<String, dynamic> toMap() {
+    return {
+      'title': this.title,
+      'urlToImage': this.urlToImage,
+      'author': this.author,
+      'content': this.content,
+      'publishedAt': this.publishedAt,
+    };
+  }
+
+  factory Article.fromMap(Map<String, dynamic> map) {
+    return Article(
+      title: map['title'] as String,
+      urlToImage: map['urlToImage'] as String,
+      author: map['author'] as String,
+      content: map['content'] as String,
+      publishedAt: map['publishedAt'] as String,
+    );
+  }
 //
 }
