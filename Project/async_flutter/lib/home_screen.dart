@@ -17,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _searchQuery = '';
+  String _currentCategory = 'All';
 
   @override
   Widget build(BuildContext context) {
@@ -70,23 +71,29 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 24),
               // Thanh danh sách thể loại
-              const SizedBox(
+              SizedBox(
                 height: 40,
-                child: CategoriesBar(),
+                child: CategoriesBar(onCategorySelected: _updateCategory),
               ),
               // Danh sách bài báo
               const SizedBox(height: 24),
-              Expanded(child: ArticleList(searchQuery: _searchQuery)),
+              Expanded(child: ArticleList(searchQuery: _searchQuery, category: _currentCategory,)),
             ],
           ),
         ),
       ),
     );
   }
+  void _updateCategory(String category) {
+    setState(() {
+      _currentCategory = category;
+    });
+  }
 }
 
 class CategoriesBar extends StatefulWidget {
-  const CategoriesBar({super.key});
+  final Function(String) onCategorySelected;
+  CategoriesBar({Key? key, required this.onCategorySelected}) : super(key: key);
 
   @override
   State<CategoriesBar> createState() => _CategoriesBarState();
@@ -95,11 +102,12 @@ class CategoriesBar extends StatefulWidget {
 class _CategoriesBarState extends State<CategoriesBar> {
   List<String> categories = const [
     'All',
-    'Politics',
+    'Science',
     'Sports',
     'Health',
-    'Music',
-    'Tech'
+    'Entertainment',
+    'Technology',
+    'Business'
   ];
 
   int currentCategory = 0;
@@ -112,13 +120,15 @@ class _CategoriesBarState extends State<CategoriesBar> {
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () {
-            currentCategory = index;
-            setState(() {});
+            setState(() {
+              currentCategory = index;
+            });
+            String selectedCategory = categories.elementAt(index);
+            widget.onCategorySelected(selectedCategory);
           },
           child: Container(
             margin: const EdgeInsets.only(right: 8.0),
             padding: const EdgeInsets.symmetric(
-              // vertical: 8.0,
               horizontal: 20.0,
             ),
             decoration: BoxDecoration(
@@ -138,19 +148,21 @@ class _CategoriesBarState extends State<CategoriesBar> {
         );
       },
     );
+
   }
 }
 
 class ArticleList extends StatelessWidget {
-  const ArticleList({Key? key, required this.searchQuery}) : super(key: key);
-  static const List<Article> _savedArticles = [];
+  const ArticleList({Key? key, required this.searchQuery, required this.category}) : super(key: key);
+  static List<Article> _savedArticles = [];
   final String searchQuery;
+  final String category;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder(
-        future: getArticles(),
+        future: getArticles(category),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
@@ -191,9 +203,12 @@ class ArticleList extends StatelessWidget {
     );
   }
 
-  Future<List<Article>> getArticles() async {
-    const url =
-        'https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=...'; //apikey is private
+  Future<List<Article>> getArticles(String category) async {
+    String url = 'https://newsapi.org/v2/top-headlines?country=us';
+    if (category != 'All') {
+      url += '&category=$category';
+    }
+    url += '&apiKey=...';  //apikey is private
     final res = await http.get(Uri.parse(url));
     final body = json.decode(res.body) as Map<String, dynamic>;
     final List<Article> result = [];
