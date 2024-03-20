@@ -16,6 +16,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String _searchQuery = '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,6 +54,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: TextFormField(
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value.toLowerCase();
+                    });
+                  },
                   decoration: InputDecoration(
                     fillColor: Colors.grey.shade300,
                     filled: true,
@@ -69,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               // Danh sách bài báo
               const SizedBox(height: 24),
-              const Expanded(child: ArticleList()),
+              Expanded(child: ArticleList(searchQuery: _searchQuery)),
             ],
           ),
         ),
@@ -135,8 +142,9 @@ class _CategoriesBarState extends State<CategoriesBar> {
 }
 
 class ArticleList extends StatelessWidget {
-  const ArticleList({super.key});
+  const ArticleList({Key? key, required this.searchQuery}) : super(key: key);
   static const List<Article> _savedArticles = [];
+  final String searchQuery;
 
   @override
   Widget build(BuildContext context) {
@@ -152,47 +160,22 @@ class ArticleList extends StatelessWidget {
                 child: CircularProgressIndicator(),
               );
             case ConnectionState.done:
-              final data = snapshot.data ?? [];
+              final List<Article> articles = snapshot.data ?? [];
+              final filteredArticles = articles.where((article) {
+                return article.title.toLowerCase().contains(searchQuery);
+              }).toList();
               return ListView.builder(
                 padding: const EdgeInsets.only(right: 16.0),
-                itemCount: data.length,
+                itemCount: filteredArticles.length,
                 itemBuilder: (context, index) {
                   return ArticleTile(
-                    article: data.elementAt(index),
+                    article: filteredArticles[index],
                   );
                 },
               );
-            // itemCount: data.length,
-            // itemBuilder: (context, index) {
-            //   final articleData = data[index];
-            //   return ListTile(
-            //     onTap: () {
-            //       Navigator.push(
-            //           context,
-            //           MaterialPageRoute(
-            //               builder: (context) =>
-            //                   ArticleDetail(article: articleData)));
-            //     },
-            //     title: articleData.title != '[Removed]'
-            //         ? Text(articleData.title,
-            //         style: TextStyle(fontWeight: FontWeight.bold))
-            //         : null,
-            //     subtitle: Text("By " + articleData.author),
-            //     leading: Image.network(
-            //       articleData.urlToImage,
-            //       width: 100,
-            //       height: 250,
-            //       fit: BoxFit.cover,
-            //     ),
-            //     trailing: Icon(Icons.more_vert),
-            //   );
-            // },
           }
         },
       ),
-      //     ],
-      //   ),
-      // ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -273,7 +256,6 @@ class ArticleTile extends StatelessWidget {
                   },
                 ),
               ),
-              // TODO: Thêm thông tin bài báo
               Expanded(
                   child: ListTile(
                     title: Text(article.title,
