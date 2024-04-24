@@ -134,31 +134,45 @@ class _SampleItemUpdateState extends State<SampleItemUpdate> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextFormField(
-                    controller: nameController,
-                    decoration: const InputDecoration(labelText: 'Tên'),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 13),
+                    child: TextFormField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                          border: OutlineInputBorder(), hintText: 'Tên truyện'),
+                    ),
                   ),
-                  TextFormField(
-                    controller: authorController,
-                    decoration: const InputDecoration(labelText: 'Tác giả'),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 13),
+                    child: TextFormField(
+                      controller: authorController,
+                      decoration: const InputDecoration(
+                          border: OutlineInputBorder(), hintText: 'Tác giả'),
+                    ),
                   ),
-                  TextFormField(
-                    controller: contentController,
-                    decoration: const InputDecoration(labelText: 'Nội dung'),
-                    keyboardType: TextInputType.multiline,
-                    maxLines: 5,
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 13),
+                    child: TextFormField(
+                      controller: contentController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Nội dung',
+                      ),
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 5,
+                    ),
                   ),
                   ElevatedButton(
                     onPressed: _pickImage,
                     child:
                         Text(imageFile != null ? 'Chọn lại ảnh' : 'Chọn ảnh'),
                   ),
+                  const SizedBox(height: 10),
                   imageFile != null
                       ? Image.file(
                           File(imageFile!.path),
                           width: MediaQuery.of(context).size.width,
                           fit: BoxFit.cover,
-                          height: 105,
                         )
                       : const SizedBox.shrink(),
                 ],
@@ -372,7 +386,8 @@ class SampleItemSearchDelegate extends SearchDelegate<SampleItem> {
           leading: CircleAvatar(
             backgroundImage: item.image.isNotEmpty
                 ? FileImage(File(item.image))
-                : const AssetImage('assets/images/flutter_logo.png') as ImageProvider,
+                : const AssetImage('assets/images/flutter_logo.png')
+                    as ImageProvider,
           ),
           onTap: () {
             close(context, item);
@@ -401,7 +416,8 @@ class SampleItemSearchDelegate extends SearchDelegate<SampleItem> {
           leading: CircleAvatar(
             backgroundImage: item.image.isNotEmpty
                 ? FileImage(File(item.image))
-                : const AssetImage('assets/images/flutter_logo.png') as ImageProvider,
+                : const AssetImage('assets/images/flutter_logo.png')
+                    as ImageProvider,
           ),
           onTap: () {
             close(context, item);
