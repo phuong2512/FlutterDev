@@ -168,7 +168,7 @@ class _SampleItemUpdateState extends State<SampleItemUpdate> {
                         Text(imageFile != null ? 'Chọn lại ảnh' : 'Chọn ảnh'),
                   ),
                   const SizedBox(height: 10),
-                  imageFile != null
+                  imageFile != null && File(imageFile!.path).existsSync()
                       ? Image.file(
                           File(imageFile!.path),
                           width: MediaQuery.of(context).size.width,
