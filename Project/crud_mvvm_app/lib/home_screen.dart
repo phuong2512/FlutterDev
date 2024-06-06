@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:crud_mvvm_app/sample_item_services.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -27,27 +28,62 @@ class SampleItem {
         .toRadixString(35)
         .substring(0, 9);
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': this.id,
+      'name': name.value,
+      'author': author.value,
+      'content': content.value,
+      // 'image': image,
+    };
+  }
+
+  factory SampleItem.fromMap(Map<String, dynamic> map) {
+    return SampleItem(
+      id: map['id'] as String,
+      name: map['name'],
+      author: map['author'],
+      content: map['content'],
+      // image: map['image'] as String,
+    );
+  }
 }
 
 class SampleItemViewModel extends ChangeNotifier {
-  static final _instance = SampleItemViewModel._();
+  static final _instance = SampleItemViewModel._internal();
   factory SampleItemViewModel() => _instance;
-  SampleItemViewModel._();
+  SampleItemViewModel._internal() {
+    final values = services.loadItem();
+    if (values is List<SampleItem>) {
+      items.clear();
+      // items.addAll(values);
+      notifyListeners();
+    }
+  }
+
+  final services = SampleItemServices();
   final List<SampleItem> items = [];
 
-  void addItem(String name, String author, String content, String image) {
-    items.add(
-        SampleItem(name: name, author: author, content: content, image: image));
+  Future addItem(String name, String author, String content, String image) async{
+    var item =
+        SampleItem(name: name, author: author, content: content, image: image);
+    items.add(item);
     notifyListeners();
+    services.addItem(item);
+    return item;
   }
 
-  void removeItem(String id) {
+  Future removeItem(String id) async{
     items.removeWhere((item) => item.id == id);
     notifyListeners();
+    //
+    services.removeItem(id);
+    return items;
   }
 
-  void updateItem(String id, String newName, String newAuthor,
-      String newContent, String newImage) {
+  Future updateItem(String id, String newName, String newAuthor, String newContent,
+      String newImage) async{
     try {
       final item = items.firstWhere((item) => item.id == id);
       item.name.value = newName;
